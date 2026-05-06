@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoArchitecture — One person, holding the pen for every role.</title>
+<meta name="description" content="NeoArchitecture is the practice of designing and shipping software systems by orchestrating AI as the execution layer, with full architectural judgment. The practitioner is a NeoArchitect.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4EEE2;
+    --paper-deep: #ECE3D0;
+    --paper-edge: #E0D5BD;
+    --ink: #1A1612;
+    --ink-soft: #3D342B;
+    --ink-muted: #8A7E6B;
+    --rust: #B8431F;
+    --rust-deep: #8C2F12;
+    --moss: #3D5A3F;
+    --gold: #C8923A;
+    --rule: #C4B79C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse at top, rgba(184,67,31,0.05), transparent 55%),
+      radial-gradient(ellipse at bottom, rgba(61,90,63,0.04), transparent 55%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.04 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    opacity: 0.6;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* SITE HEADER */
+  .site-header {
+    position: relative;
+    z-index: 3;
+    padding: 28px 32px;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(244, 238, 226, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .site-header-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 100;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .wordmark-mark {
+    font-style: italic;
+    color: var(--rust);
+    font-weight: 300;
+  }
+
+  .wordmark-domain {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-muted);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  .site-nav {
+    display: flex;
+    gap: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .site-nav a {
+    transition: color 0.2s ease;
+    position: relative;
+  }
+
+  .site-nav a:hover {
+    color: var(--rust);
+  }
+
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 2;
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* HERO / DEFINITION */
+  .hero {
+    padding: 120px 0 80px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+    margin-bottom: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    height: 1px;
+    width: 32px;
+    background: var(--rust);
+  }
+
+  .hero-definition {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 80, 'opsz' 144;
+    font-weight: 300;
+    font-size: clamp(28px, 4.2vw, 48px);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .hero-definition .term {
+    font-weight: 500;
+    color: var(--rust-deep);
+    font-style: normal;
+  }
+
+  .hero-definition em {
+    font-style: italic;
+    color: var(--rust);
+    font-weight: 400;
+  }
+
+  .hero-coda {
+    margin-top: 36px;
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 300;
+  }
+
+  /* DECORATIVE DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 80px auto 60px;
+    max-width: 880px;
+    padding: 0 32px;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .divider-mark {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--rust);
+  }
+
+  /* PRIMARY CARD — THE MANIFESTO */
+  .primary-card {
+    margin: 0 auto;
+    max-width: 880px;
+    padding: 0 32px 0;
+  }
+
+  .primary-card a {
+    display: block;
+    background: var(--paper-deep);
+    padding: 56px 56px;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--rust);
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 0 rgba(26,22,18,0.04), 0 20px 40px -30px rgba(140,47,18,0.18);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .primary-card a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgba(26,22,18,0.06), 0 30px 60px -30px rgba(140,47,18,0.3);
+    border-left-color: var(--rust-deep);
+  }
+
+  .primary-card-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 700;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .primary-card-eyebrow::after {
+    content: '';
+    height: 1px;
+    flex: 0 0 60px;
+    background: var(--rust);
+    opacity: 0.5;
+  }
+
+  .primary-card-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 100;
+    font-weight: 400;
+    font-size: clamp(34px, 5vw, 52px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .primary-card-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .primary-card-deck {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    font-weight: 300;
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+
+  .primary-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--rule);
+  }
+
+  .primary-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .primary-card-action {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--rust-deep);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: gap 0.25s ease;
+  }
+
+  .primary-card a:hover .primary-card-action {
+    gap: 18px;
+  }
+
+  .primary-card-action::after {
+    content: '→';
+    font-style: normal;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  /* SECONDARY CARDS */
+  .secondary-section {
+    padding: 0 32px;
+    max-width: 880px;
+    margin: 48px auto 0;
+  }
+
+  .secondary-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .secondary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .secondary-card a {
+    display: block;
+    background: var(--paper);
+    padding: 32px 32px 28px;
+    border: 1px solid var(--rule);
+    transition: all 0.25s ease;
+    height: 100%;
+    position: relative;
+  }
+
+  .secondary-card a:hover {
+    background: var(--paper-deep);
+    border-color: var(--rust);
+    transform: translateY(-1px);
+  }
+
+  .secondary-card-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .secondary-card-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .secondary-card-title em { font-style: italic; }
+
+  .secondary-card-deck {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    min-height: 75px;
+  }
+
+  .secondary-card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+  }
+
+  .secondary-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .secondary-card-action {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--rust);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.25s ease;
+  }
+
+  .secondary-card-action::after {
+    content: '→';
+    font-style: normal;
+  }
+
+  .secondary-card a:hover .secondary-card-action {
+    gap: 14px;
+  }
+
+  /* AUTHOR NOTE */
+  .author-note {
+    margin: 120px auto 0;
+    max-width: 680px;
+    padding: 80px 32px 0;
+    text-align: center;
+    border-top: 1px solid var(--rule);
+    padding-top: 64px;
+  }
+
+  .author-note-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .author-note p {
+    font-family: 'Newsreader', serif;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .author-note p:last-of-type { margin-bottom: 0; }
+
+  .author-note p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .author-note .term {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--rust-deep);
+    white-space: nowrap;
+  }
+
+  .author-credit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 36px;
+    padding: 24px 0;
+    border-top: 1px dashed var(--rule);
+    border-bottom: 1px dashed var(--rule);
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .credit-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  .credit-byline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+
+  .credit-byline strong {
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  .credit-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+
+  /* FOOTER COLOPHON */
+  .colophon {
+    margin: 80px 0 0;
+    padding: 32px 32px 56px;
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    position: relative;
+    z-index: 2;
+  }
+
+  .colophon span:first-child {
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 720px) {
+    .site-header { padding: 20px 22px; }
+    .container { padding: 0 22px; }
+    .hero { padding: 72px 0 56px; }
+    .primary-card { padding: 0 22px; }
+    .primary-card a { padding: 36px 28px; }
+    .primary-card-deck { font-size: 18px; }
+    .secondary-section { padding: 0 22px; margin-top: 36px; }
+    .secondary-grid { grid-template-columns: 1fr; }
+    .secondary-card a { padding: 28px 24px 24px; }
+    .secondary-card-deck { min-height: auto; }
+    .author-note { padding: 56px 22px 0; margin-top: 80px; }
+    .colophon { padding: 24px 22px 40px; font-size: 9px; }
+    .site-nav { gap: 18px; font-size: 10px; }
+  }
+
+  @media (max-width: 480px) {
+    .wordmark-domain { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="wordmark">
+        <span>Neo<span class="wordmark-mark">Architecture</span></span>
+        <span class="wordmark-domain">neoarchitect.ai</span>
+      </a>
+      <nav class="site-nav">
+        <a href="manifesto.html">Manifesto</a>
+        <a href="chart.html">The Chart</a>
+        <a href="field-guide.html">Field Guide</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO / DEFINITION -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-eyebrow">A new discipline</div>
+        <h1 class="hero-definition">
+          <span class="term">NeoArchitecture</span> is the practice of designing and shipping software systems by orchestrating AI as the execution layer — with full architectural <em>judgment</em>.
+        </h1>
+        <p class="hero-coda">A <span style="font-family:'Fraunces',serif;font-weight:500;color:var(--rust-deep);">NeoArchitect</span> holds the pen for every role in the production pipeline. The AI holds the keyboard.</p>
+      </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      <span class="divider-mark">❦</span>
+    </div>
+
+    <!-- PRIMARY CARD: THE MANIFESTO -->
+    <section class="primary-card">
+      <a href="manifesto.html">
+        <div class="primary-card-eyebrow">Start here</div>
+        <h2 class="primary-card-title">The <em>NeoArchitecture</em> Manifesto</h2>
+        <p class="primary-card-deck">A new discipline, in eight tenets — on what one person plus AI can ship, what the work actually requires, and what happens to organizations that do not learn it in time.</p>
+        <div class="primary-card-foot">
+          <span class="primary-card-meta">8 Tenets · ~12 min read</span>
+          <span class="primary-card-action">Read the manifesto</span>
+        </div>
+      </a>
+    </section>
+
+    <!-- SECONDARY CARDS: CHART + FIELD GUIDE -->
+    <section class="secondary-section">
+      <div class="secondary-label">— Then —</div>
+      <div class="secondary-grid">
+
+        <div class="secondary-card">
+          <a href="chart.html">
+            <div class="secondary-card-eyebrow">See the numbers</div>
+            <h3 class="secondary-card-title">Time, Roles, &amp; the <em>Handoff Multiplier</em></h3>
+            <p class="secondary-card-deck">30 person-weeks compressed into 15 hours, charted — with the caveats, the kit, and the recursion of a chart-about-compression made fast.</p>
+            <div class="secondary-card-foot">
+              <span class="secondary-card-meta">Companion · ~5 min</span>
+              <span class="secondary-card-action">See the chart</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="secondary-card">
+          <a href="field-guide.html">
+            <div class="secondary-card-eyebrow">Go deeper</div>
+            <h3 class="secondary-card-title">Working <em>with</em> AI — The Field Guide</h3>
+            <p class="secondary-card-deck">A six-module training guide on how the work actually gets done. Memory, context, plan-execute-verify, collaboration, and the cost of replacement over retraining.</p>
+            <div class="secondary-card-foot">
+              <span class="secondary-card-meta">6 Modules · ~50 min</span>
+              <span class="secondary-card-action">Open the guide</span>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- AUTHOR NOTE -->
+    <section class="author-note">
+      <div class="author-note-label">— A note from the author —</div>
+      <p>This site is a working hypothesis. The argument is that the gap between what one person can ship and what a team can ship has narrowed in a way that deserves a name, a discipline, and a defense.</p>
+      <p>The three artifacts here are an attempt to claim the names — <span class="term">NeoArchitect</span>, <span class="term">NeoArchitecture</span> — and to describe the practice clearly enough that the people already doing the work can recognize themselves in it, and the organizations already cutting those people can see what they are losing.</p>
+      <p>Each artifact was itself built using the discipline it describes.</p>
+      <div class="author-credit">
+        <span class="credit-label">— Written by —</span>
+        <span class="credit-byline"><strong>Armando Saiz</strong> &amp; <strong>Claude</strong></span>
+        <span class="credit-meta">An exercise in NeoArchitecture · 2026</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER COLOPHON -->
+  <footer class="colophon">
+    <span>neoarchitect.ai</span>
+    <span>Set in Fraunces &amp; Newsreader</span>
+    <span>For the people still doing the work</span>
+  </footer>
+
+</body>
+</html>

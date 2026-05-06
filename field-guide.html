@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working With AI — A Field Guide for People Who Still Have Judgment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4EEE2;
+    --paper-deep: #ECE3D0;
+    --paper-edge: #E0D5BD;
+    --ink: #1A1612;
+    --ink-soft: #3D342B;
+    --ink-muted: #8A7E6B;
+    --rust: #B8431F;
+    --rust-deep: #8C2F12;
+    --moss: #3D5A3F;
+    --gold: #C8923A;
+    --rule: #C4B79C;
+    --highlight: #F5DC9C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  /* SITE HEADER */
+  .site-header {
+    position: relative;
+    z-index: 3;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(244, 238, 226, 0.92);
+  }
+  .site-header a { color: inherit; text-decoration: none; }
+  .site-header-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 100;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .wordmark-mark { font-style: italic; color: var(--rust); font-weight: 300; }
+  .wordmark-domain {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-muted);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+  .site-nav {
+    display: flex;
+    gap: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .site-nav a { transition: color 0.2s ease; }
+  .site-nav a:hover { color: var(--rust); }
+  .site-nav a.current { color: var(--rust); }
+  @media (max-width: 720px) {
+    .site-header { padding: 18px 22px; }
+    .site-nav { gap: 16px; font-size: 10px; }
+  }
+  @media (max-width: 480px) {
+    .wordmark-domain { display: none; }
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.65;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(184,67,31,0.04), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(61,90,63,0.04), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.04 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    opacity: 0.6;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .container-wide {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .masthead-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 80px;
+  }
+
+  .masthead-meta span:first-child {
+    color: var(--rust);
+    font-weight: 500;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .eyebrow::before, .eyebrow::after {
+    content: '';
+    height: 1px;
+    background: var(--rust);
+    flex: 0 0 32px;
+  }
+
+  .title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 100, 'opsz' 144;
+    font-weight: 300;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+
+  .title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  .subtitle {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 600px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .byline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding-bottom: 60px;
+  }
+
+  .byline strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* MASTHEAD CREDIT */
+  .masthead-credit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 36px;
+    padding: 24px 0 28px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .masthead-credit-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  .masthead-credit-byline {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+
+  .masthead-credit-byline strong {
+    font-weight: 500;
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  .masthead-credit-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+
+  /* PREAMBLE WARNING */
+  .preamble {
+    margin: 100px auto;
+    padding: 0;
+    position: relative;
+  }
+
+  .preamble-inner {
+    background: linear-gradient(180deg, var(--paper-deep) 0%, var(--paper-edge) 100%);
+    padding: 72px 64px;
+    border-left: 4px solid var(--rust);
+    position: relative;
+    box-shadow: 0 1px 0 rgba(26,22,18,0.08), 0 30px 60px -30px rgba(140,47,18,0.2);
+  }
+
+  .preamble-inner::before {
+    content: '⚠';
+    position: absolute;
+    top: 28px;
+    right: 32px;
+    font-size: 24px;
+    color: var(--rust);
+    opacity: 0.5;
+  }
+
+  .preamble-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+
+  .preamble-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+
+  .preamble-headline em {
+    font-style: italic;
+    color: var(--rust-deep);
+  }
+
+  .preamble p {
+    font-size: 19px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: var(--ink-soft);
+  }
+
+  .preamble p:first-of-type::first-letter {
+    font-family: 'Fraunces', serif;
+    font-size: 72px;
+    line-height: 0.85;
+    float: left;
+    padding: 6px 12px 0 0;
+    color: var(--rust);
+    font-weight: 400;
+  }
+
+  .preamble-pullquote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 36px 0;
+    padding: 24px 0 24px 32px;
+    border-left: 2px solid var(--rust);
+  }
+
+  .stakes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .stakes-card {
+    background: var(--paper);
+    padding: 28px;
+    border: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .stakes-card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    margin-bottom: 12px;
+  }
+
+  .stakes-card h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .stakes-card p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* TABLE OF CONTENTS */
+  .toc {
+    margin: 120px auto;
+    padding: 60px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+  }
+
+  .toc-list {
+    list-style: none;
+  }
+
+  .toc-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px dashed var(--rule);
+    transition: all 0.3s ease;
+  }
+
+  .toc-list li:last-child { border-bottom: none; }
+
+  .toc-list li:hover {
+    padding-left: 12px;
+  }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--rust);
+    flex: 0 0 40px;
+    font-weight: 500;
+  }
+
+  .toc-list a {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    flex: 1;
+    transition: color 0.2s ease;
+  }
+
+  .toc-list a:hover { color: var(--rust); }
+
+  .toc-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+
+  /* MODULES */
+  .module {
+    margin: 100px auto;
+    padding: 60px 0;
+  }
+
+  .module-header {
+    margin-bottom: 56px;
+    position: relative;
+  }
+
+  .module-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--rust);
+    margin-bottom: 16px;
+    display: block;
+    font-weight: 500;
+  }
+
+  .module-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .module-title em {
+    font-style: italic;
+  }
+
+  .module-deck {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 580px;
+    font-weight: 300;
+  }
+
+  .module-body h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 48px 0 20px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .module-body h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 32px 0 16px;
+    font-weight: 600;
+  }
+
+  .module-body p {
+    margin-bottom: 22px;
+    color: var(--ink-soft);
+  }
+
+  .module-body p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .module-body em {
+    font-style: italic;
+  }
+
+  .module-body ul {
+    margin: 20px 0 24px 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .module-body ul li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+  }
+
+  .module-body ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+    font-family: 'Fraunces', serif;
+  }
+
+  /* DEFINITION BOX */
+  .definition {
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+    padding: 32px 36px;
+    margin: 32px 0;
+    position: relative;
+  }
+
+  .definition-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .definition p {
+    margin: 0;
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  /* PULL QUOTE */
+  .pullquote {
+    margin: 56px 0;
+    padding: 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .pullquote::before {
+    content: '"';
+    font-family: 'Fraunces', serif;
+    font-size: 120px;
+    color: var(--rust);
+    opacity: 0.18;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 1;
+  }
+
+  .pullquote p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(24px, 3vw, 32px);
+    line-height: 1.3;
+    color: var(--ink);
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* TWO COLUMN COMPARISON */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 40px 0;
+    border: 1px solid var(--rule);
+  }
+
+  .comparison-side {
+    padding: 32px;
+    background: var(--paper-deep);
+  }
+
+  .comparison-side:first-child {
+    border-right: 1px solid var(--rule);
+  }
+
+  .comparison-side h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .comparison-side p {
+    font-size: 16px;
+    line-height: 1.55;
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 80px 0;
+    gap: 16px;
+  }
+
+  .divider span {
+    font-family: 'Fraunces', serif;
+    color: var(--rust);
+    font-size: 24px;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    height: 1px;
+    flex: 0 0 60px;
+    background: var(--rule);
+  }
+
+  /* TAKEAWAY */
+  .takeaway {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px 44px;
+    margin: 40px 0;
+    position: relative;
+  }
+
+  .takeaway-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .takeaway p {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.4;
+    margin: 0;
+    color: var(--paper);
+    font-weight: 300;
+    letter-spacing: -0.005em;
+  }
+
+  /* WORKFLOW DIAGRAM */
+  .workflow {
+    margin: 40px 0;
+    padding: 36px;
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+  }
+
+  .workflow-stages {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 12px;
+    align-items: stretch;
+    margin-top: 24px;
+  }
+
+  .workflow-stage {
+    background: var(--paper);
+    padding: 20px;
+    border: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  .workflow-stage-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+
+  .workflow-stage h6 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .workflow-stage p {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .workflow-arrow {
+    font-family: 'Fraunces', serif;
+    color: var(--rust);
+    font-size: 24px;
+    align-self: center;
+  }
+
+  /* TERM TREATMENT — NeoArchitect / NeoArchitecture */
+  .term {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--rust-deep);
+    font-style: normal;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+  }
+
+  .term-define {
+    background: linear-gradient(180deg, transparent 60%, rgba(245,220,156,0.55) 60%);
+    padding: 0 2px;
+  }
+
+  /* COINAGE BLOCK — for the formal introduction of the term */
+  .coinage {
+    margin: 48px 0;
+    padding: 40px 44px;
+    background: var(--paper-deep);
+    border-top: 2px solid var(--rust);
+    border-bottom: 2px solid var(--rust);
+    position: relative;
+  }
+
+  .coinage-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .coinage-term {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'SOFT' 100;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .coinage-pronunciation {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .coinage-definition {
+    font-family: 'Newsreader', serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .coinage-definition strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .coinage-pair {
+    display: flex;
+    gap: 28px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--rule);
+    font-size: 15px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+
+  .coinage-pair-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .coinage-pair-item span:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+
+  .coinage-pair-item span:last-child {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    color: var(--ink);
+  }
+
+  /* SPAGHETTI MODE BLOCK */
+  .modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 40px 0;
+  }
+
+  .mode {
+    padding: 32px;
+    border: 1px solid var(--rule);
+    background: var(--paper-deep);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-divergent {
+    background: linear-gradient(135deg, var(--paper-deep) 0%, rgba(200,146,58,0.12) 100%);
+  }
+
+  .mode-convergent {
+    background: linear-gradient(135deg, var(--paper-deep) 0%, rgba(61,90,63,0.1) 100%);
+  }
+
+  .mode-icon {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--rust);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .mode h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .mode p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  .mode p:last-child { margin-bottom: 0; }
+
+  /* CLOSING */
+  .closing {
+    margin: 120px auto 80px;
+    padding: 60px 0;
+    text-align: center;
+    border-top: 2px solid var(--rust);
+  }
+
+  .closing-mark {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 48px;
+    color: var(--rust);
+    margin-bottom: 24px;
+  }
+
+  .closing h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 44px);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+
+  .closing h2 em { font-style: italic; }
+
+  .closing p {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-soft);
+    max-width: 540px;
+    margin: 0 auto;
+    font-weight: 300;
+    line-height: 1.55;
+  }
+
+  /* COLOPHON */
+  .colophon {
+    padding: 48px 0 72px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .colophon-credit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 24px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .colophon-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  .colophon-byline {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--ink);
+    font-style: italic;
+    letter-spacing: -0.005em;
+  }
+
+  .colophon-byline strong {
+    font-weight: 500;
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  .colophon-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .colophon-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--rust);
+    z-index: 100;
+    transition: width 0.1s ease;
+    width: 0%;
+  }
+
+  /* FLOATING NAV */
+  .floating-nav {
+    position: fixed;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 50;
+  }
+
+  .floating-nav a {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .floating-nav a.active {
+    background: var(--rust);
+    border-color: var(--rust);
+    transform: scale(1.4);
+  }
+
+  .floating-nav a:hover::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: 2px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    body { font-size: 17px; }
+    .container, .container-wide { padding: 0 24px; }
+    .preamble-inner { padding: 40px 28px; }
+    .stakes-grid { grid-template-columns: 1fr; }
+    .comparison { grid-template-columns: 1fr; }
+    .comparison-side:first-child {
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+    }
+    .modes { grid-template-columns: 1fr; }
+    .workflow-stages {
+      grid-template-columns: 1fr;
+    }
+    .workflow-arrow {
+      transform: rotate(90deg);
+      justify-self: center;
+    }
+    .floating-nav { display: none; }
+    .toc-list li { gap: 12px; }
+    .toc-list a { font-size: 18px; }
+    .toc-meta { display: none; }
+    .masthead-meta { flex-direction: column; gap: 8px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="wordmark">
+      <span>Neo<span class="wordmark-mark">Architecture</span></span>
+      <span class="wordmark-domain">neoarchitect.ai</span>
+    </a>
+    <nav class="site-nav">
+      <a href="manifesto.html">Manifesto</a>
+      <a href="chart.html">The Chart</a>
+      <a href="field-guide.html" class="current">Field Guide</a>
+    </nav>
+  </div>
+</header>
+
+<nav class="floating-nav" id="floatingNav">
+  <a href="#preamble" data-label="The Stakes" class="active"></a>
+  <a href="#module-1" data-label="What Agents Are"></a>
+  <a href="#module-2" data-label="Memory & Context"></a>
+  <a href="#module-3" data-label="How Work Happens"></a>
+  <a href="#module-4" data-label="Collaboration"></a>
+  <a href="#module-5" data-label="Two Modes"></a>
+  <a href="#module-6" data-label="What It Means"></a>
+  <a href="#closing" data-label="Closing"></a>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="container">
+  <div class="masthead">
+    <div class="masthead-meta">
+      <span>Vol. 01 — Field Guide</span>
+      <span>Edition 2026</span>
+    </div>
+    <div class="eyebrow">A Practical Training Guide</div>
+    <h1 class="title">Working <em>with</em> AI</h1>
+    <p class="subtitle">A field guide to the emerging discipline of <span class="term">NeoArchitecture</span> — and to the people whose judgment, experience, and craft remain the actual point.</p>
+    <div class="masthead-credit">
+      <span class="masthead-credit-label">— Written by —</span>
+      <span class="masthead-credit-byline"><strong>Armando Saiz</strong> &amp; <strong>Claude</strong></span>
+      <span class="masthead-credit-meta">An exercise in NeoArchitecture · 2026</span>
+    </div>
+    <div class="byline">For practitioners, leaders, and anyone <strong>still doing the work</strong></div>
+  </div>
+</header>
+
+<!-- PREAMBLE -->
+<section id="preamble" class="container preamble">
+  <div class="preamble-inner">
+    <div class="preamble-label">Read this first — the stakes</div>
+    <h2 class="preamble-headline">Why this guide exists, and what happens if you treat AI as a <em>replacement</em> instead of an <em>amplifier</em>.</h2>
+
+    <p>There is a strategic mistake quietly happening across the industry, and it deserves to be named clearly before anything else in this guide makes sense. Companies are interpreting AI productivity gains as a headcount-reduction opportunity. The reasoning sounds clean: if one person with AI does the work of three, you need a third as many people. So you cut. You stop hiring juniors. You let mid-level practitioners go. You collapse the layers that used to do the planning, the verification, the judgment work.</p>
+
+    <p>The problem is that the people being cut are disproportionately the very people who would extract the most value from AI in the long run.</p>
+
+    <div class="preamble-pullquote">A senior engineer with twenty years of experience and an AI subscription is genuinely doing what a team used to do. A bootcamp graduate with the same subscription is producing plausible-looking work they cannot evaluate. The tool does not level the field — it tilts it further toward people with deep judgment.</div>
+
+    <p>Everything that follows in this guide rests on a single observation: <strong>AI amplifies judgment, it does not replace it</strong>. The plan-execute-verify pattern requires someone who can write a good plan and recognize a bad output. The toggling between exploratory and disciplined work requires someone who knows when to switch. The handoff documents require someone who knows what is worth preserving. None of this is automatable. None of it is junior work. It is the accumulated taste and pattern recognition of practitioners who learned the underlying craft long enough to know what good looks like.</p>
+
+    <p>If you eliminate the junior tier because "AI can do that now," you have eliminated the training ground for the senior tier. In ten years, the people who would have been your senior judgment-holders will not exist, because they never got to be junior. The AI will still need them. The industry just will not have produced them.</p>
+
+    <h4 style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rust-deep); margin: 40px 0 20px; font-weight: 700;">What happens when you choose replacement over retraining</h4>
+
+    <div class="stakes-grid">
+      <div class="stakes-card">
+        <div class="stakes-card-num">CONSEQUENCE 01</div>
+        <h4>Volume rises, quality degrades</h4>
+        <p>Output increases dramatically while the people who could tell when it was wrong are no longer in the room. The errors compound silently, often only surfacing after they have been deployed at scale.</p>
+      </div>
+      <div class="stakes-card">
+        <div class="stakes-card-num">CONSEQUENCE 02</div>
+        <h4>The pipeline collapses</h4>
+        <p>Senior judgment is grown, not hired. Cutting juniors today removes the path that produces seniors tomorrow. The shortage will not be visible for several years, but it is being manufactured right now.</p>
+      </div>
+      <div class="stakes-card">
+        <div class="stakes-card-num">CONSEQUENCE 03</div>
+        <h4>The institutional memory walks out</h4>
+        <p>The taste, the conventions, the unwritten knowledge of why the system is the way it is — that lives in people. When they leave, the AI keeps generating, but it generates against a context nobody understands anymore.</p>
+      </div>
+      <div class="stakes-card">
+        <div class="stakes-card-num">CONSEQUENCE 04</div>
+        <h4>The competitive gap widens — the wrong way</h4>
+        <p>The companies that retained their judgment and gave it AI tooling will pull steadily ahead. The ones that cut and assumed AI would fill the gap will discover, eighteen months in, that they cannot tell the difference between good output and confident garbage.</p>
+      </div>
+    </div>
+
+    <p style="margin-top: 40px;">This guide is built on the premise that you — reader, practitioner, manager, builder — are the asset. The chapters that follow are an honest accounting of how AI actually works, where its limits are, and the new craft required to wield it well: a discipline we call <span class="term">NeoArchitecture</span>. <strong>Retraining is not a courtesy. It is the strategy.</strong></p>
+  </div>
+</section>
+
+<!-- TABLE OF CONTENTS -->
+<section class="container toc">
+  <div class="toc-label">— The Six Modules —</div>
+  <ol class="toc-list">
+    <li>
+      <span class="toc-num">I.</span>
+      <a href="#module-1">What an AI Agent Actually Is</a>
+      <span class="toc-meta">8 min</span>
+    </li>
+    <li>
+      <span class="toc-num">II.</span>
+      <a href="#module-2">Memory, Context, and the Limits of "the Loop"</a>
+      <span class="toc-meta">10 min</span>
+    </li>
+    <li>
+      <span class="toc-num">III.</span>
+      <a href="#module-3">How AI Work Actually Gets Done</a>
+      <span class="toc-meta">9 min</span>
+    </li>
+    <li>
+      <span class="toc-num">IV.</span>
+      <a href="#module-4">Collaboration: One Person, Then a Team</a>
+      <span class="toc-meta">12 min</span>
+    </li>
+    <li>
+      <span class="toc-num">V.</span>
+      <a href="#module-5">The Two Modes — Spaghetti and Structure</a>
+      <span class="toc-meta">7 min</span>
+    </li>
+    <li>
+      <span class="toc-num">VI.</span>
+      <a href="#module-6">What This Means for You and Your Organization</a>
+      <span class="toc-meta">8 min</span>
+    </li>
+  </ol>
+</section>
+
+<!-- MODULE 1 -->
+<section id="module-1" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module One —</span>
+    <h2 class="module-title">What an AI agent <em>actually</em> is</h2>
+    <p class="module-deck">The business definition and the technical definition tell different stories. You need both to make decent decisions.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>Two definitions, two audiences</h3>
+    <p>The word "agent" has taken on a kind of mystical weight in 2026. It is worth pulling it apart into its two honest meanings before going any further, because nearly every conversation about AI strategy quietly conflates them.</p>
+
+    <div class="definition">
+      <div class="definition-label">Business Definition</div>
+      <p>An AI agent is software that can take on a task or role on behalf of a person or organization, working toward a goal with some degree of autonomy. Instead of just answering questions, an agent can plan, decide, and act across multiple steps to actually get something done — booking the meeting, processing the refund, navigating a website to complete a purchase. The framing emphasizes outcomes and labor: a digital worker that augments or replaces human effort.</p>
+    </div>
+
+    <div class="definition">
+      <div class="definition-label">Technical Definition</div>
+      <p>An AI agent is a system built around a language model that operates in a loop: it perceives some state, reasons about what to do next, and takes actions by calling tools or APIs that affect an environment, then observes the results and repeats. The defining components are a model serving as the reasoning core, a set of tools the model can invoke, memory or state that persists across steps, and a control loop that lets the model take multiple turns until a stopping condition is met.</p>
+    </div>
+
+    <p>The short version of the difference: the business definition cares about <em>what the agent does for you</em>; the technical definition cares about <em>how it works internally</em>. Most strategic mistakes come from buying the business definition without checking the technical one.</p>
+
+    <h3>Where we actually are</h3>
+    <p>Agents work reasonably well today when the task is narrow, the tools are well-defined, the environment is stable, and the cost of a mistake is low or recoverable. Coding agents are the clearest success story. Customer support triage, data extraction pipelines, research assistants, and certain RPA-style workflows also work in production. In these cases, "no person in the loop" is partially true — a person sets up the task and reviews the output, but does not babysit each step.</p>
+
+    <p>The further you get from narrow tasks, the worse it gets. The core problems are not really about model intelligence anymore. The problems are:</p>
+
+    <ul>
+      <li><strong>Compounding error.</strong> If each step is 95% reliable, a 20-step task succeeds about 36% of the time. Real autonomy requires either dramatically higher per-step reliability or robust error recovery, and we have neither at the level needed for most business processes.</li>
+      <li><strong>Brittleness to the unexpected.</strong> Agents handle the happy path well and fall apart when the website changes, the API returns something weird, or the task requires a judgment call the prompt did not anticipate.</li>
+      <li><strong>Verification.</strong> Even when an agent finishes a task, knowing whether it did it correctly often requires a human to check — which defeats the point.</li>
+      <li><strong>Trust and accountability.</strong> For anything involving money, legal exposure, customer relationships, or irreversible actions, organizations are unwilling to remove the human. This is a governance problem as much as a technical one.</li>
+    </ul>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Module Takeaway</div>
+      <p>We are in the era of agents-as-junior-employees who do real work but need a manager. The era of agents-as-autonomous-operators is being demoed, not deployed. The marketing has gotten well ahead of the reality, and decisions made on the marketing tend to age badly.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container"><div class="divider"><span>❦</span></div></div>
+
+<!-- MODULE 2 -->
+<section id="module-2" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module Two —</span>
+    <h2 class="module-title">Memory, context, and the limits of <em>"the loop"</em></h2>
+    <p class="module-deck">The most consequential thing to internalize: the model has no memory. Everything that looks like memory is a trick performed on top.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>The model is stateless</h3>
+    <p>Every call to a language model is a stateless function call. You send a list of messages; the model returns a response; the server forgets everything the moment the response is sent. There is no session, no memory, no continuity on the model's side. If you want a multi-turn conversation, your code stores the previous messages and sends them all back with each new request. The model does not know it is in a conversation — it just sees a list of messages on each call and generates the next one.</p>
+
+    <p>The "memory" features in products — saved facts, project rules, persistent notes — are all variations of one trick: store some notes externally, then inject them into the context window at the start of new sessions. <strong>It is not memory in the human sense. It is a filing cabinet that gets read aloud at the start of each meeting.</strong> This works for stable facts ("user prefers Python, works at Acme") and works poorly for nuanced working state ("we tried approach A, it failed for reason B, so we pivoted to C and were halfway through implementing it when…").</p>
+
+    <h3>What happens to long sessions</h3>
+    <p>Three distinct things degrade a long working session, and it helps to be able to name them.</p>
+
+    <h4>01. Context compaction</h4>
+    <p>When the conversation approaches the context limit, the system summarizes earlier turns to make room. The summary is lossy by design — the CliffsNotes version. Details that seemed unimportant at summarization time but turn out to matter later are simply gone.</p>
+
+    <h4>02. Attention dilution</h4>
+    <p>Even within the context window, models do not attend to all tokens equally well. Information buried in a long context gets less weight than information at the start or end. A 150K-token conversation is not 10x more reliable than a 15K one — often it is worse, because signal gets drowned in noise.</p>
+
+    <h4>03. Loop and rut behavior</h4>
+    <p>Long sessions accumulate failed attempts, half-finished reasoning, and partial states. The model conditions on all of that, including its own earlier mistakes, and can get stuck repeating patterns. A fresh chat with a clean problem statement often outperforms a long chat with full history.</p>
+
+    <h3>The API is the same problem with the wrappers off</h3>
+
+    <div class="comparison">
+      <div class="comparison-side">
+        <h5>Chat Interface</h5>
+        <p>The model plus a support team. Auto-summarization, memory features, retrieval, system prompts tuned for conversation. The limitations are hidden by product scaffolding, which is convenient but also obscures what is actually happening.</p>
+      </div>
+      <div class="comparison-side">
+        <h5>API Direct</h5>
+        <p>The model in its natural state — a stateless function. Same context limits, same lost-in-the-middle problem, no auto-compaction. But: full control over what enters context, when summarization happens, and how state is externalized. Worse defaults, better ceiling.</p>
+      </div>
+    </div>
+
+    <p>Vendors selling "agentic AI" platforms should be asked one diagnostic question: <em>what is your context management strategy?</em> If the answer is hand-wavy or amounts to "we just keep appending to the message history," the system will demo well and degrade in production for exactly the reasons described above. If the answer involves deliberate context curation, externalized state, checkpoint summarization, and verification steps, the team has actually grappled with the constraint.</p>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Module Takeaway</div>
+      <p>Treat the model as a capable but amnesiac collaborator rather than a persistent coworker. The unit of work is a session, not a relationship. The people getting the most leverage are not the ones with the longest chats — they are the ones who have internalized the constraint and built rituals around it.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container"><div class="divider"><span>❦</span></div></div>
+
+<!-- MODULE 3 -->
+<section id="module-3" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module Three —</span>
+    <h2 class="module-title">How AI work <em>actually</em> gets done</h2>
+    <p class="module-deck">The plan-execute-verify pattern is not a productivity hack. It is the architectural response to a stateless model with degrading attention.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>The pattern</h3>
+    <p>Effective AI work usually looks like a sequence of focused, fresh model calls passing structured artifacts between them, rather than one long conversation that tries to hold everything at once. Three roles emerge naturally, even when one person is doing all of them:</p>
+
+    <div class="workflow">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--ink-muted); text-transform: uppercase;">The Pattern</div>
+      <div class="workflow-stages">
+        <div class="workflow-stage">
+          <div class="workflow-stage-label">Stage 01</div>
+          <h6>Plan</h6>
+          <p>Produce a structured plan. Steps, inputs, outputs, success criteria. Self-contained.</p>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-stage">
+          <div class="workflow-stage-label">Stage 02</div>
+          <h6>Execute</h6>
+          <p>Take one step at a time, with focused context, producing a real artifact.</p>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-stage">
+          <div class="workflow-stage-label">Stage 03</div>
+          <h6>Verify</h6>
+          <p>Check the output against explicit criteria. Not "looks fine" — actual checks.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Why the roles re-emerge</h3>
+    <p>People often notice with surprise that the workflow they end up building looks suspiciously like the team they replaced — a planner, an executor, a reviewer. This is not a coincidence. <strong>The roles were never artifacts of corporate politics. They were a response to genuine cognitive limits.</strong> Planning well requires a different mental posture than executing well, and verifying well requires distance from both. Humans split these roles because one brain doing all three at once does all three poorly. It turns out one context window doing all three at once has the same problem. The architecture re-asserts itself.</p>
+
+    <p>So you are not really collapsing roles when you adopt AI. You are collapsing <em>people</em>. The roles are still there; they are being played by separate invocations of the same model with different prompts and different scoped contexts. That is a profound shift in how work gets organized — but it is not the disappearance of structured collaboration. It is structured collaboration where the participants happen to be ephemeral.</p>
+
+    <h3>The handoff artifact is the entire game</h3>
+    <p>Because each stage is a fresh, memoryless invocation, the document passed between stages has to be self-contained. The planner cannot assume the executor will "remember" anything, because the executor literally cannot. So the plan has to encode everything the executor needs.</p>
+
+    <p>This forces a discipline that is actually healthy — it is the same discipline that makes good engineering tickets, good design docs, and good async-team communication work for distributed humans. The handoff artifact is to AI work what a well-written ticket is to remote engineering: the unit on which everything depends.</p>
+
+    <div class="pullquote">
+      <p>The whole pattern lives or dies on the quality of the intermediate documents.</p>
+    </div>
+
+    <h4>What good handoffs contain</h4>
+    <ul>
+      <li>Explicit goals — not "make this better" but "produce X that satisfies Y"</li>
+      <li>Stated assumptions — anything the planner took for granted that the executor might not</li>
+      <li>Success criteria the verifier can actually check — measurable, not vibes</li>
+      <li>Out-of-scope notes — what was considered and rejected, so the executor does not re-litigate</li>
+      <li>The minimum context needed to act, not the full history of how the plan came to be</li>
+    </ul>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Module Takeaway</div>
+      <p>Stop trying to do everything in one long session. Split the work along the natural seams — plan, execute, verify — and invest in the artifacts that move work across the seams. The model is one component; the system around it is where the engineering happens.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container"><div class="divider"><span>❦</span></div></div>
+
+<!-- MODULE 4 -->
+<section id="module-4" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module Four —</span>
+    <h2 class="module-title">Collaboration: one person, <em>then a team</em></h2>
+    <p class="module-deck">Single-user AI workflows are mostly solved. Multi-human teams co-developing with AI is where things get genuinely messy.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>The single-user case</h3>
+    <p>For one person working with AI across multiple sessions, the playbook is reasonably clear by now. Keep sessions scoped to a single coherent task. Hand off deliberately rather than letting things degrade. Prime new sessions with the relevant artifacts — Word docs, spreadsheets, design docs, decision logs — that capture the structural state of the work. Treat each session as fresh and trust the artifact more than the model's "memory" of prior sessions.</p>
+
+    <p>Many people feel a flicker of guilt at how "old-fashioned" this looks. Specs, plans, structured documents — it can feel like the bureaucratic overhead AI was supposed to eliminate. <strong>It is not.</strong> The artifacts look the same as traditional engineering artifacts because the underlying problem is the same: preserving context across discontinuities. But the cost of producing them has dropped enormously. A spec that used to take a team two weeks of meetings and revisions can be drafted in twenty minutes with AI helping you structure it. The discipline is real but the tax has collapsed.</p>
+
+    <h3>The multi-human case</h3>
+    <p>Two developers, each with their own AI, co-building a project — this picture has a structural problem: there are now four participants, two of whom (the AIs) have no memory of each other and no shared context, and two of whom (the humans) have to mediate. Each AI reads only its human's notes each morning. The AIs are not collaborating; they are each helping their human, and the humans are doing the actual collaboration the old-fashioned way.</p>
+
+    <p>This is fine for some workflows and breaks down badly for others.</p>
+
+    <div class="comparison">
+      <div class="comparison-side">
+        <h5>Where it works</h5>
+        <p>When work is cleanly partitioned. You take the auth module, I take the billing module. Our AIs help us each in our lane. We integrate at the seams like any normal team. The AI is a per-person force multiplier, not a shared collaborator.</p>
+      </div>
+      <div class="comparison-side">
+        <h5>Where it breaks</h5>
+        <p>When work is genuinely entangled. We are both modifying the same data model. We are making architectural decisions that constrain each other. The AI you used to refactor a module made assumptions my AI does not know about, and the assumptions are not visible in the resulting code.</p>
+      </div>
+    </div>
+
+    <h3>The patterns that help</h3>
+
+    <h4>Shared context documents</h4>
+    <p>Living specs, architecture docs, decision logs that everyone's AI sessions read at the start. Works well for stable shared knowledge. Works poorly for in-flight working state.</p>
+
+    <h4>Shared session artifacts</h4>
+    <p>Pasting each other's chat transcripts, handoff documents, or AI-generated summaries into your own sessions. Genuinely useful but manual and high-friction. Does not scale.</p>
+
+    <h4>Centralized AI agents on shared infrastructure</h4>
+    <p>AI-driven CI, AI code reviewers on every pull request, AI agents watching the issue tracker. The AI is a shared service rather than each person's intern. Works well for narrow functions. Does not replace the per-person collaborator.</p>
+
+    <h4>Single source of truth in code and tickets</h4>
+    <p>The project artifacts — the codebase, the tracker, the design docs — become the shared state, and each person's AI reads from and writes to that shared state. <strong>Probably the most promising direction.</strong> It aligns with how distributed human teams already work: the repo is the truth, the tickets are the plan, and any contributor (human or AI) operates against that shared substrate.</p>
+
+    <div class="pullquote">
+      <p>The teams getting real leverage from AI are the ones whose work is well-documented, well-structured, and legible enough that an amnesiac collaborator can pick it up cold and contribute meaningfully.</p>
+    </div>
+
+    <p>Async-first remote teams figured out long ago that you compensate for lack of shared real-time context with excellent written artifacts: design docs, ADRs, RFCs, runbooks, postmortems. AI-augmented work is converging on the same answer for the same reason. The discipline that makes a great distributed engineering team is the same discipline that makes AI agents productive, because the underlying problem — coordinating work without shared continuous memory — is the same.</p>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Module Takeaway</div>
+      <p>Teams that already write well adapt easily to AI. Teams that relied on hallway conversations and tribal knowledge struggle, because there is no hallway and the tribe forgets every night. Invest in the shared substrate before you invest in the next AI tool.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container"><div class="divider"><span>❦</span></div></div>
+
+<!-- MODULE 5 -->
+<section id="module-5" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module Five —</span>
+    <h2 class="module-title">The two modes — <em>spaghetti</em> and <em>structure</em></h2>
+    <p class="module-deck">Discipline makes AI reliable. Rigidity kills the magic. The skill is knowing which mode you are in, and switching cleanly.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>The tension nobody quite resolves</h3>
+    <p>Discipline and structure make AI collaboration reliable. Rigidity and over-specification kill the upside that made AI interesting in the first place. These tendencies are not fully reconcilable, and pretending otherwise leads to bad advice in both directions.</p>
+
+    <p>The over-disciplined failure mode treats the model like a compiler: write an exhaustive spec, hand it over, get back exactly what you asked for and nothing more. This works, but you have used a Ferrari to drive to the mailbox. The under-disciplined failure mode is the sprawling exploratory chat that produces a lot of interesting moments and no shippable artifact. Spaghetti-on-the-wall finds genuinely surprising things, but if you cannot capture them, structure them, and build on them, you have just had an entertaining afternoon.</p>
+
+    <h3>Why "throwing spaghetti" actually works</h3>
+    <p>It is not random, even though it feels that way. What is happening is that you are using the AI as a generator over a much larger space of possibilities than you could enumerate yourself. Your brain has a particular shape — habits, biases, paths well-worn from experience. The model does not share your shape, so when you describe a problem loosely and let it riff, it surfaces options that would not have occurred to you, including bad ones. <strong>Your job in that mode is not to specify; it is to recognize.</strong> You are filtering, not directing.</p>
+
+    <h3>The two postures</h3>
+
+    <div class="modes">
+      <div class="mode mode-divergent">
+        <div class="mode-icon">~</div>
+        <h5>Divergent Mode</h5>
+        <p><strong>Loose, exploratory, low-stakes.</strong> No specification. The whole point is to find things you did not know to look for.</p>
+        <p>Discipline here would prevent the discovery. You are throwing spaghetti and watching what sticks. Used early, used freely, used to widen the search space.</p>
+      </div>
+      <div class="mode mode-convergent">
+        <div class="mode-icon">=</div>
+        <h5>Convergent Mode</h5>
+        <p><strong>Tight, structured, artifact-producing.</strong> Once you have found the thing worth building, you switch postures.</p>
+        <p>Now you specify, plan, hand off, verify. Discipline here makes the thing actually get built and survive contact with reality.</p>
+      </div>
+    </div>
+
+    <h3>The craft has a name</h3>
+    <p>Knowing which mode you are in and switching cleanly is, we think, a genuinely new craft — one that has been quietly waiting for a name. The available labels do not fit. <em>Prompt engineer</em> is too narrow and already feels dated; it describes typing into a box, not designing a system. <em>AI operator</em> is too passive. <em>AI orchestrator</em> implies the parts already exist and just need conducting. None of them capture what the work actually is: deciding what the model sees, when it sees it, what flows where, how artifacts move between stages, what verification looks like, and when to widen versus narrow the search. That is structural design work. It is architecture, applied to a new substrate.</p>
+
+    <div class="coinage">
+      <div class="coinage-label">— A coinage for the discipline —</div>
+      <h4 class="coinage-term"><span class="term-define">NeoArchitect</span></h4>
+      <p class="coinage-pronunciation">noun · /ˈniː.oʊˌɑːr.kɪ.tɛkt/</p>
+      <p class="coinage-definition"><strong>A practitioner who designs the structure within which AI work happens.</strong> The NeoArchitect decides what enters the model's context, when sessions start and end, what artifacts flow between stages, and how verification is built into the loop. The work is structural, not transactional — closer to systems architecture than to writing prompts.</p>
+      <p class="coinage-definition">The discipline inherits real DNA from systems architecture, software engineering, and async-team communication, adapted to a substrate where the collaborator is stateless and the unit of continuity is the artifact rather than the conversation.</p>
+      <div class="coinage-pair">
+        <div class="coinage-pair-item">
+          <span>The Practitioner</span>
+          <span>NeoArchitect</span>
+        </div>
+        <div class="coinage-pair-item">
+          <span>The Practice</span>
+          <span>NeoArchitecture</span>
+        </div>
+        <div class="coinage-pair-item">
+          <span>The Adjective</span>
+          <span>NeoArchitectural</span>
+        </div>
+      </div>
+    </div>
+
+    <p>People who stay in divergent mode forever produce a lot of interesting prototypes and ship nothing. People who stay in convergent mode forever ship things, but they ship the obvious thing — the thing they already could have built without the AI. The <span class="term">NeoArchitect</span> works the toggle. Neither extreme captures the value; the craft is in the switching.</p>
+
+    <p>Practicing <span class="term">NeoArchitects</span> tend to develop a few habits worth borrowing:</p>
+
+    <ul>
+      <li><strong>Spaghetti early, structure late.</strong> Begin loose. Capture structure when something worth building emerges.</li>
+      <li><strong>Run two sessions in parallel.</strong> A scratch session for exploration alongside a disciplined one for building.</li>
+      <li><strong>Build divergence checkpoints into structured workflows.</strong> "Before we lock this in, give me three approaches I have not considered." A small dose of mode-switching, deliberately scheduled.</li>
+      <li><strong>Notice the mode you are actually in.</strong> The most common mistake is thinking you are in one mode while behaving like you are in the other. Drift happens silently.</li>
+    </ul>
+
+    <div class="pullquote">
+      <p>The discipline is not the enemy of the magic. But undifferentiated discipline applied at the wrong moment kills the magic just as surely as no discipline at all.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Module Takeaway</div>
+      <p>You will lose some surprise when you tighten up. That is real. The looser the prompt, the larger the search space, the higher the chance of genuine novelty — and the lower the chance of a usable artifact. Sequence them, do not pick one. The craft is in the toggle.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container"><div class="divider"><span>❦</span></div></div>
+
+<!-- MODULE 6 -->
+<section id="module-6" class="container module">
+  <header class="module-header">
+    <span class="module-num">— Module Six —</span>
+    <h2 class="module-title">What this means for <em>you</em>, and your organization</h2>
+    <p class="module-deck">Pulling the threads together: practical implications for individuals, leaders, and the institutions still trying to figure out what to do.</p>
+  </header>
+
+  <div class="module-body">
+    <h3>For the individual practitioner</h3>
+    <p>Your judgment is appreciating in value, not depreciating. The market for capable <span class="term">NeoArchitects</span> is in the very early innings, and what makes someone good at the discipline is exactly what made them good at the underlying craft before — taste, pattern recognition, the ability to recognize when an output is subtly wrong. <span class="term">NeoArchitecture</span> adds a few new capabilities specific to AI work:</p>
+
+    <ul>
+      <li><strong>Session hygiene.</strong> Keeping sessions scoped, knowing when to hand off, building artifacts that survive the handoff.</li>
+      <li><strong>Mode awareness.</strong> Knowing whether you are in divergent or convergent mode, and switching deliberately.</li>
+      <li><strong>Verification instincts.</strong> Reading AI output critically, especially when it looks plausible. The plausibility is the trap.</li>
+      <li><strong>Context curation.</strong> Deciding what the model needs to see and what it does not, and structuring the inputs so the relevant signal is loud.</li>
+    </ul>
+
+    <p>These are learnable. They are also worth learning before the people around you do, because the gap between AI-leveraged practitioners and the rest is widening fast and rewards compound over time.</p>
+
+    <h3>For the leader and the organization</h3>
+    <p>The smart move, if you took the productivity gains seriously, would be roughly the opposite of what most companies are doing. Keep your experienced people. Give them AI tooling. Let them produce dramatically more output per person — taking on more projects, attacking problems that were previously uneconomic, building things that would not have cleared the cost-benefit bar before. Your competitive advantage would be the combination, not the AI alone.</p>
+
+    <p>You would invest more in junior development, not less, because the bottleneck on AI value is judgment, and judgment takes years to grow. You would specifically hire and train people for <span class="term">NeoArchitecture</span> — and recognize that the people best positioned to develop the discipline are the ones who already know the underlying domain.</p>
+
+    <div class="pullquote">
+      <p>You would treat AI as a force multiplier on talent rather than a substitute for it, because that is what it actually is.</p>
+    </div>
+
+    <h3>Why most companies are doing the opposite anyway</h3>
+    <p>It is worth being honest about this, because the reasons are not all stupid:</p>
+
+    <ul>
+      <li><strong>Short-term incentive structure.</strong> Cutting headcount produces immediate, measurable cost savings. Productivity gains from AI-augmented experienced workers are real but slower to materialize. Public companies optimize for the legible metric.</li>
+      <li><strong>Genuine uncertainty about what AI can do.</strong> Executives are getting confident messaging from vendors and consultants. Cutting on the assumption that AI will fill the gap is a bet, often made without really knowing.</li>
+      <li><strong>Cargo-cult behavior.</strong> Companies see other companies cut and assume they should too, or face investor pressure to demonstrate they are "AI-forward." Layoffs become a signaling mechanism for AI seriousness, regardless of whether they make sense.</li>
+      <li><strong>Survivorship bias on the upside.</strong> The companies talking loudest about AI productivity gains are often the ones for whom it is working — and they are often working precisely because they kept their good people. The companies that cut and lost capability rarely publish case studies about it.</li>
+    </ul>
+
+    <h3>The two-to-five-year picture</h3>
+    <p>The gap between AI-leverage haves and have-nots will widen dramatically, but not along the lines most people expect. It will not be "companies with AI versus companies without" — everyone will have AI. It will be <strong>companies that kept the people who can wield AI well versus companies that cut them.</strong> The first group will pull away. The second will discover, eighteen months in, that their AI deployments are producing volume but not quality, that nobody can tell when the outputs are wrong, and that the institutional knowledge needed to course-correct walked out the door.</p>
+
+    <p>Some of those companies will figure it out and reverse course at significant cost. Some will not, and will quietly decline while attributing it to other factors. A few industries will get permanently restructured by this, and the winners will be the ones who understood what AI actually amplifies.</p>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Final Takeaway</div>
+      <p>The investment is not really in the AI. It is in the people who know how to use it. Retraining is the strategy. Replacement is the failure mode that looks rational quarter to quarter and catastrophic in aggregate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section id="closing" class="container closing">
+  <div class="closing-mark">❦</div>
+  <h2>A craft, <em>not a tool</em></h2>
+  <p>What we have been describing throughout is not a productivity hack or a software trick. It is <span class="term">NeoArchitecture</span> — a new craft in the old sense, a body of practice that takes time to develop, rewards taste, and pays back compound interest for the people who take it seriously. The tools will keep changing. The craft will keep mattering.</p>
+</section>
+
+<!-- COLOPHON -->
+<footer class="container">
+  <div class="colophon">
+    <div class="colophon-credit">
+      <span class="colophon-label">— Written by —</span>
+      <span class="colophon-byline"><strong>Armando Saiz</strong> &amp; <strong>Claude</strong></span>
+      <span class="colophon-year">An exercise in NeoArchitecture · 2026</span>
+    </div>
+    <div class="colophon-meta">
+      <span>Set in Fraunces &amp; Newsreader</span>
+      <span>For the people still doing the work</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Progress bar
+  const progressBar = document.getElementById('progressBar');
+  const navLinks = document.querySelectorAll('.floating-nav a');
+  const sections = ['preamble', 'module-1', 'module-2', 'module-3', 'module-4', 'module-5', 'module-6', 'closing'];
+
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+
+    // Update active nav dot
+    let activeIdx = 0;
+    sections.forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.4) {
+        activeIdx = idx;
+      }
+    });
+    navLinks.forEach((link, idx) => {
+      link.classList.toggle('active', idx === activeIdx);
+    });
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+</script>
+
+</body>
+</html>
